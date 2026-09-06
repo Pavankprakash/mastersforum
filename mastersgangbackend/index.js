@@ -9,6 +9,7 @@ dotenv.config();
 
 
 const port = process.env.PORT
+
 require('./db')
 
 const allowedOrigins = [process.env.FRONTEND_URL]; // Add more origins as needed
@@ -24,19 +25,13 @@ app.use(
         },
         credentials: true, // Allow cookies to be sent
     })
-)
+);
+
 app.use(bodyParser.json());
-app.use(cookieParser({
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-    signed: true
-}));
+app.use(cookieParser());
 
 const authRoutes = require('./routes/authRoutes')
 const classroomRoutes =require('./routes/classroomRoutes')
-
 
 app.use('/auth', authRoutes);
 app.use('/classrooms', classroomRoutes);

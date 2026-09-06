@@ -17,7 +17,6 @@ const ProtectedRoute = ({ children }) => {
   const [loading, setLoading] = useState(true); // Loading state while checking auth
   const navigate = useNavigate();
 
-
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
@@ -30,16 +29,11 @@ const ProtectedRoute = ({ children }) => {
         console.log(data)
         if (response.ok && data.ok) {
           login({ userId: data.userId }); // Set user in context
-          setLoading(false); // User is logged in, loading is done
         } else {
-          toast.error(data.message || 'Session expired. Please log in again.');
           navigate('/login');
         }
-
-
-      }
-      catch (error) {
-        toast.error('Error checking login status.');
+      }catch (error) {
+        console.log(error);
         navigate('/login');
       } finally {
         setLoading(false);
@@ -47,11 +41,10 @@ const ProtectedRoute = ({ children }) => {
     }
     checkLoginStatus();
 
-  }, [navigate])
+  }, [navigate, login]);
   if (loading) {
     return <div>Loading...</div>; // can add a spinner or loading indicator here
   }
-
   return auth.user ? children : <Navigate to="/login" />;
 }
 
@@ -78,7 +71,6 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/classes/:classid"
             element={
@@ -87,10 +79,8 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-
         </Routes>
         <ToastContainer />
-
       </Router>
     </AuthProvider>
   )

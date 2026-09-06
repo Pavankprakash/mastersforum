@@ -115,8 +115,8 @@ router.post('/register', async (req, res) => {
         const authToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1d' });
         const refreshToken = jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET_KEY, { expiresIn: '10d' });
 
-        res.cookie('authToken', authToken, { httpOnly: true, secure: true, sameSite: 'none' });
-        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none' });
+        res.cookie('authToken', authToken, { httpOnly: true, secure: false, sameSite: 'lax', maxAge: 24 * 60 * 60 * 1000 });
+        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false, sameSite: 'lax', maxAge: 10 * 24 * 60 * 60 * 1000 });
 
         user.password = undefined;
         return responseFunction(res, 200, 'Registered successfully', { user, authToken, refreshToken }, true);
@@ -139,16 +139,16 @@ router.post('/login', async (req, res, next) =>{
         if(!isMatch){
             return responseFunction(res, 400, 'Invalid credentials',null, false);
         }
-        const authToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1d' })
-        const refreshToken = jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET_KEY, { expiresIn: '10d' })
+        const authToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1d' });
+        const refreshToken = jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET_KEY, { expiresIn: '10d' });
 
 
         user.password = undefined;
 
-         res.cookie('authToken', authToken, { httpOnly: true, secure: true, sameSite: 'none' })
-        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none' })
+        res.cookie('authToken', authToken, { httpOnly: true, secure: false, sameSite: 'lax', maxAge: 24 * 60 * 60 * 1000 });
+        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false, sameSite: 'lax', maxAge: 10 * 24 * 60 * 60 * 1000 });
 
-        return responseFunction(res, 200, 'Logged in successfully', { user, authToken, refreshToken }, true);
+        return responseFunction(res, 200, 'Logged in successfully', { user }, true);
 
     }
     catch (err) {

@@ -12,8 +12,6 @@ const Navbar = () => {
     setShowPopup(!showPopup);
   };
 
-
-
   return (
     <nav className="navbar">
       <div className="navbar-left">
@@ -25,9 +23,7 @@ const Navbar = () => {
           <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
         </svg>
 
-
         {showPopup && <SearchPopup onClose={togglePopup} />} {/* Render the popup */}
-
 
       </div>
       <div className="navbar-right">

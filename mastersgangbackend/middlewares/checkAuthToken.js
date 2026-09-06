@@ -5,8 +5,12 @@ function checkAuth(req, res, next) {
     const authToken = req.cookies.authToken;
     const refreshToken = req.cookies.refreshToken;
 
+    console.log("AUTH TOKEN:", authToken ? "FOUND" : "NOT FOUND");
+    console.log("REFRESH TOKEN:", refreshToken ? "FOUND" : "NOT FOUND");
+
     if (!authToken || !refreshToken) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(401).json({ 
+            message: 'Unauthorized' });
     }
     jwt.verify(authToken, process.env.JWT_SECRET_KEY, (err, decoded) => {
         if (err) {
@@ -14,20 +18,21 @@ function checkAuth(req, res, next) {
                 if (refreshErr) {
                     return res.status(401).json({ message: 'Unauthorized' });
                 }
-
                 else {
                     const newAuthToken = jwt.sign({ userId: refreshDecoded.userId }, process.env.JWT_SECRET_KEY, { expiresIn: '1d' })
                     const newRefreshToken = jwt.sign({ userId: refreshDecoded.userId }, process.env.JWT_REFRESH_SECRET_KEY, { expiresIn: '10d' })
                     res.cookie('authToken', newAuthToken, {
-                        sameSite: 'none',
                         httpOnly: true,
-                        secure: true
+                        secure: false,
+                        sameSite: 'lax',
+                        maxAge: 24 * 60 * 60 * 1000
                     });
 
                     res.cookie('refreshToken', newRefreshToken, {
-                        sameSite: 'none',
                         httpOnly: true,
-                        secure: true
+                        secure: false,
+                        sameSite: 'lax',
+                        maxAge: 10 * 24 * 60 * 60 * 1000
                     });
 
                     req.userId = refreshDecoded.userId;
@@ -44,6 +49,5 @@ function checkAuth(req, res, next) {
             next();
         }
     })    
-
 }
 module.exports = checkAuth;
