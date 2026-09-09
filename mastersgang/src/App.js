@@ -14,7 +14,7 @@ import ClassesDetails from './pages/ClassesDetails';
 
 const ProtectedRoute = ({ children }) => {
   const { auth, login } = useAuth();
-  const [loading, setLoading] = useState(true); // Loading state while checking auth
+  const [loading, setLoading] = useState(true); //Loading state while checking auth
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const ProtectedRoute = ({ children }) => {
         });
         const data = await response.json();
 
-        console.log(data)
+        console.log("Check Login :",data)
         if (response.ok && data.ok) {
           login({ userId: data.userId }); // Set user in context
         } else {
@@ -38,10 +38,10 @@ const ProtectedRoute = ({ children }) => {
       } finally {
         setLoading(false);
       }
-    }
+    };
     checkLoginStatus();
 
-  }, [navigate, login]);
+  }, [navigate,]);
   if (loading) {
     return <div>Loading...</div>; // can add a spinner or loading indicator here
   }
@@ -52,22 +52,42 @@ const App = () => {
   return (
     <AuthProvider>
       <Router>
-        <Navbar />
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          {/* 
+              PUBLIC ROUTES
+              No Navbar
+          */}
+          <Route
+            path="/login"
+            element={<Login />}
+          />
+          <Route
+            path="/signup"
+            element={<Signup />}
+          />
+          {/* 
+              PROTECTED ROUTES
+              Navbar appears here
+         */}
           <Route
             path="/"
             element={
               <ProtectedRoute>
-                <HomePage />
+                <>
+                  <Navbar />
+                  <HomePage />
+                </>
               </ProtectedRoute>
-            } />
+            }
+          />
           <Route
             path="/profile"
             element={
               <ProtectedRoute>
-                <ProfilePage />
+                <>
+                  <Navbar />
+                  <ProfilePage />
+                </>
               </ProtectedRoute>
             }
           />
@@ -75,15 +95,23 @@ const App = () => {
             path="/classes/:classid"
             element={
               <ProtectedRoute>
-                <ClassesDetails />
+                <>
+                  <Navbar />
+                  <ClassesDetails />
+                </>
               </ProtectedRoute>
             }
+          />
+          {/* Unknown URL */}
+          <Route
+            path="*"
+            element={<Navigate to="/login" replace />}
           />
         </Routes>
         <ToastContainer />
       </Router>
     </AuthProvider>
-  )
-}
+  );
+};
 
-export default App
+export default App;
